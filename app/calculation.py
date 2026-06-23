@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import sys
 
 class Operation:
@@ -25,18 +26,19 @@ class OperationLink:
         val = ""
         while link is not None:
             if link.operation == Operation.END:
-                val += f"{link.number}"
+                val += f"{link.number} ="
                 break
             val += f"{link.number} {link.operation} "
             link = link.next
         return val
 
 class Calculator:
-    def __init__(self):
-        self.head = None
+    def __init__(self, head):
+        self.head = copy.copy(head)
         self.result = None
 
     def calculate(self):
+        backup_head = copy.copy(self.head)
         if not self.head:
             raise ValueError("No calculation to perform.")
 
@@ -44,37 +46,45 @@ class Calculator:
         while current_link is not None and current_link.operation != Operation.END:
             if current_link.operation == Operation.POWER:
                 current_link.number **= current_link.next.number
+                current_link.operation = current_link.next.operation
                 current_link.AssignNext(current_link.next.next)
             elif current_link.operation == Operation.ROOT:
                 if current_link.next.number == 0:
                     raise ZeroDivisionError("Division by zero.")
                 current_link.number **= 1 / current_link.next.number
+                current_link.operation = current_link.next.operation
                 current_link.AssignNext(current_link.next.next)
-            current_link = current_link.next
+            else:
+                current_link = current_link.next
         current_link = self.head
         
         while current_link is not None and current_link.operation != Operation.END:
             if current_link.operation == Operation.MULTIPLY:
                 current_link.number *= current_link.next.number
+                current_link.operation = current_link.next.operation
                 current_link.AssignNext(current_link.next.next)
             elif current_link.operation == Operation.DIVIDE:
                 if current_link.next.number == 0:
                     raise ZeroDivisionError("Division by zero.")
                 current_link.number /= current_link.next.number
+                current_link.operation = current_link.next.operation
                 current_link.AssignNext(current_link.next.next)
-            current_link = current_link.next
+            else:
+                current_link = current_link.next
         current_link = self.head
         
         while current_link is not None and current_link.operation != Operation.END:
             if current_link.operation == Operation.ADD:
                 current_link.number += current_link.next.number
+                current_link.operation = current_link.next.operation
                 current_link.AssignNext(current_link.next.next)
             elif current_link.operation == Operation.SUBTRACT:
-                if current_link.next.number == 0:
-                    raise ZeroDivisionError("Division by zero.")
                 current_link.number -= current_link.next.number
+                current_link.operation = current_link.next.operation
                 current_link.AssignNext(current_link.next.next)
-            current_link = current_link.next
+            else:
+                current_link = current_link.next
         
         self.result = self.head.number
+        self.head = backup_head
         return self.result
