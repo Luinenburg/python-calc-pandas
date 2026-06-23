@@ -1,5 +1,5 @@
 import calculation
-
+from calculator_memento import data_handler
 
 def parse(calculation_string: str):
     """
@@ -42,10 +42,32 @@ def parse(calculation_string: str):
     return head
 
 def test_repl():
+    username = input("Enter your username: ")
+    user_data = data_handler(username)
+    user_data.load_config_from_csv()
+    user_data.load_history_from_csv()
+
     while True:
         user_input = input("Enter a calculation (or 'exit' to quit): ")
         if user_input.lower() == 'exit':
             break
+        elif user_input.lower() == 'history':
+            history_df = user_data.get_history_dataframe()
+            print(history_df)
+            continue
+        elif user_input.lower().startswith('history_size'):
+            try:
+                _, size_str = user_input.split()
+                new_size = int(size_str)
+                user_data.config.history_size = new_size
+                print(f"History size updated to {new_size}.")
+            except ValueError:
+                print("Invalid history size command. Use 'history_size <number>'.")
+            continue
+        elif user_input.lower().startswith('clear'):
+            user_data.history.clear()
+            print("History cleared.")
+            continue
         try:
             head = parse(user_input)
             if head is None:
@@ -54,8 +76,12 @@ def test_repl():
             calculator = calculation.Calculator(head)
             result = calculator.calculate()
             print(f"Result: {result}")
+            user_data.add_history_entry(user_input, result)
         except Exception as exception:
             print(f"Error: {exception}")
+
+    user_data.save_history_to_csv()
+    user_data.save_config_to_csv()
 
 if __name__ == "__main__":
     test_repl()
