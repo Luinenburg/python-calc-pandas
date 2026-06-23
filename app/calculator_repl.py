@@ -40,3 +40,22 @@ def parse(calculation_string: str):
         current_link.AssignOperation(calculation.Operation.END)
 
     return head
+
+def test_repl():
+    while True:
+        user_input = input("Enter a calculation (or 'exit' to quit): ")
+        if user_input.lower() == 'exit':
+            break
+        try:
+            head = parse(user_input)
+            if head is None:
+                print("No calculation provided.")
+                continue
+            calculator = calculation.Calculator(head)
+            result = calculator.calculate()
+            print(f"Result: {result}")
+        except Exception as exception:
+            print(f"Error: {exception}")
+
+if __name__ == "__main__":
+    test_repl()
