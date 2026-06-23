@@ -37,7 +37,7 @@ class data_handler:
             self.history = []
 
     def add_history_entry(self, equation, result):
-        if len(self.history) >= self.config.history_size:
+        while len(self.history) >= self.config.history_size:
             self.history.pop(0)
         self.history.append(history_entry(equation, result))
 
