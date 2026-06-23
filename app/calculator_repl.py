@@ -48,7 +48,7 @@ def test_repl():
     user_data.load_history_from_csv()
 
     while True:
-        user_input = input("Enter a calculation (or 'exit' to quit): ")
+        user_input = input("Enter a calculation (or 'exit' to quit, or 'help' for commands): ")
         if user_input.lower() == 'exit':
             break
         elif user_input.lower() == 'history':
@@ -67,6 +67,14 @@ def test_repl():
         elif user_input.lower().startswith('clear'):
             user_data.history.clear()
             print("History cleared.")
+            continue
+        elif user_input.lower().startswith('help'):
+            print("Available commands:")
+            print("  exit - Quit the calculator")
+            print("  history - Display calculation history")
+            print("  history_size <number> - Set the maximum number of calculations to store")
+            print("  clear - Clear the calculation history")
+            print("  help - Display this help message")
             continue
         try:
             head = parse(user_input)
